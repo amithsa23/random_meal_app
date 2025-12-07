@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'models/grocery_item.dart';
+import 'models/meal_plan.dart';
 import 'screens/home_screen.dart';
 import 'screens/grocery_list_screen.dart';
+import 'screens/meal_planner_screen.dart';
 
 /// Main entry point for the RandomMeal app
 void main() {
@@ -41,6 +43,7 @@ class RandomMealHome extends StatefulWidget {
 class _RandomMealHomeState extends State<RandomMealHome> {
   int _selectedIndex = 0;
   final GroceryList _groceryList = GroceryList();
+  final WeeklyMealPlan _mealPlan = WeeklyMealPlan();
   late List<Widget> _screens;
 
   @override
@@ -49,6 +52,13 @@ class _RandomMealHomeState extends State<RandomMealHome> {
     _screens = [
       HomeScreen(groceryList: _groceryList),
       GroceryListScreen(groceryList: _groceryList),
+      MealPlannerScreen(
+        mealPlan: _mealPlan,
+        groceryList: _groceryList,
+        onGetRecipe: (recipe) {
+          // Callback for getting recipes from meal planner
+        },
+      ),
     ];
   }
 
@@ -57,7 +67,11 @@ class _RandomMealHomeState extends State<RandomMealHome> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _selectedIndex == 0 ? 'RandomMeal' : 'Shopping List',
+          _selectedIndex == 0 
+              ? 'RandomMeal' 
+              : _selectedIndex == 1
+                  ? 'Shopping List'
+                  : 'Meal Planner',
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
@@ -94,6 +108,11 @@ class _RandomMealHomeState extends State<RandomMealHome> {
             ),
             label: 'Shopping',
             tooltip: 'Shopping List',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.calendar_today),
+            label: 'Planner',
+            tooltip: 'Meal Planner',
           ),
         ],
       ),

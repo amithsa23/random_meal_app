@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/recipe.dart';
 import '../models/grocery_item.dart';
+import '../models/meal_plan.dart';
 import '../services/recipe_service.dart';
 import '../widgets/recipe_card.dart';
 
 /// HomeScreen is the main screen showing random meals with category filtering
 class HomeScreen extends StatefulWidget {
   final GroceryList groceryList;
+  final WeeklyMealPlan? mealPlan;
 
-  const HomeScreen({super.key, required this.groceryList});
+  const HomeScreen({
+    super.key, 
+    required this.groceryList,
+    this.mealPlan,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -99,6 +105,39 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// Show dialog to select day for meal plan
+  void _showMealPlanDaySelector() {
+    if (_currentRecipe == null || widget.mealPlan == null) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add to Meal Plan'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: WeeklyMealPlan.weekDays.map((day) {
+              return ListTile(
+                title: Text(day),
+                onTap: () {
+                  widget.mealPlan!.addMealToDay(day, _currentRecipe!);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${_currentRecipe!.name} added to $day!'),
+                      backgroundColor: Colors.blue,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -152,41 +191,59 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 16),
                       // Action buttons
-                      Row(
+                      Column(
                         children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: _addToGroceryList,
-                              icon: const Icon(Icons.shopping_cart),
-                              label: const Text('Add to List'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: _addToGroceryList,
+                                  icon: const Icon(Icons.shopping_cart),
+                                  label: const Text('Add to List'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          ElevatedButton.icon(
-                            onPressed: _toggleFavorite,
-                            icon: Icon(
-                              _favorites.contains(_currentRecipe!.id)
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                            ),
-                            label: const Text(''),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _favorites.contains(_currentRecipe!.id)
-                                  ? Colors.red
-                                  : Colors.grey[300],
-                              foregroundColor: _favorites.contains(_currentRecipe!.id)
-                                  ? Colors.white
-                                  : Colors.grey[700],
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
+                              const SizedBox(width: 12),
+                              if (widget.mealPlan != null)
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: _showMealPlanDaySelector,
+                                    icon: const Icon(Icons.calendar_today),
+                                    label: const Text('Add to Plan'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                  ),
+                                ),
+                              const SizedBox(width: 12),
+                              ElevatedButton.icon(
+                                onPressed: _toggleFavorite,
+                                icon: Icon(
+                                  _favorites.contains(_currentRecipe!.id)
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                ),
+                                label: const Text(''),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _favorites.contains(_currentRecipe!.id)
+                                      ? Colors.red
+                                      : Colors.grey[300],
+                                  foregroundColor: _favorites.contains(_currentRecipe!.id)
+                                      ? Colors.white
+                                      : Colors.grey[700],
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                         ],
                       ),

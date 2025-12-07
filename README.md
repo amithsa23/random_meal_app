@@ -7,13 +7,17 @@ A Flutter random recipe generator that fetches delicious meals from TheMealDB AP
 
 ## 🌟 Features
 
-- 🎲 Random meal generator with one click
-- 🖼️ Beautiful recipe cards with images
-- 📋 Complete ingredient lists
-- 📝 Step-by-step cooking instructions
-- 🌍 Meals from around the world
-- 📱 Responsive design
-- ⚡ Fast and lightweight
+- 🎲 **Random Meal Generator** - Discover new recipes with one click
+- 🍽️ **Category Filtering** - Browse by meal type (Breakfast, Lunch, Dessert, etc.)
+- 📋 **Complete Ingredients** - See full ingredient lists with measurements
+- 📝 **Cooking Instructions** - Step-by-step preparation guide
+- ❤️ **Favorites** - Save your favorite meals (session-persistent)
+- 📅 **Weekly Meal Planner** - Plan meals throughout the week
+- 🛒 **Grocery List** - Add ingredients to your shopping list
+- 📊 **Master Grocery List** - Compile all ingredients from weekly plan
+- 🌍 **Meals from Around the World** - Explore international cuisines
+- 📱 **Responsive Design** - Beautiful UI on all screen sizes
+- ⚡ **Fast & Lightweight** - Instant recipe loading
 
 ## 🚀 Live Demo
 
@@ -63,16 +67,38 @@ docker-compose up -d
 
 ```
 lib/
-├── main.dart              # App entry point
+├── main.dart                          # App entry point with navigation
 ├── models/
-│   └── recipe.dart       # Recipe data model
+│   ├── recipe.dart                   # Recipe data model
+│   ├── grocery_item.dart             # Shopping list models
+│   └── meal_plan.dart                # Weekly meal planning
 ├── services/
-│   └── recipe_service.dart  # API calls
+│   └── recipe_service.dart           # TheMealDB API calls
 ├── screens/
-│   └── home_screen.dart  # Main UI
+│   ├── home_screen.dart              # Recipe discovery
+│   ├── grocery_list_screen.dart      # Shopping list manager
+│   └── meal_planner_screen.dart      # Weekly meal planner
 └── widgets/
-    └── recipe_card.dart  # Recipe display widget
+    └── recipe_card.dart              # Reusable recipe display
 ```
+
+## 🎯 How to Use
+
+### 1. **Find Recipes**
+   - Browse Random recipes or select a category
+   - View full ingredient lists and instructions
+   - Add to favorites with the heart button
+
+### 2. **Plan Your Week**
+   - Click "Add to Plan" to add recipes to specific days
+   - View all meals planned for each day
+   - Remove meals as needed
+
+### 3. **Build Grocery List**
+   - Add individual recipe ingredients with "Add to List"
+   - Or compile entire week with "Add All to Grocery List"
+   - Check off items as you shop
+   - Clear completed items
 
 ## 🌐 Deployment
 
