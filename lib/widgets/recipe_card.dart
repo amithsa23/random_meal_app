@@ -2,63 +2,88 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/recipe.dart';
 
-/// RecipeCard is a reusable widget that displays recipe information
-/// Shows the meal name, image, category, area, and ingredients in a nice card layout
+/// RecipeCard displays recipe information in a beautiful card layout
 class RecipeCard extends StatelessWidget {
   final Recipe recipe;
+  final bool isFavorited;
+  final VoidCallback? onFavoritePressed;
 
   const RecipeCard({
     super.key,
     required this.recipe,
+    this.isFavorited = false,
+    this.onFavoritePressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
-      margin: const EdgeInsets.all(16),
+      elevation: 6,
+      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Meal Image with rounded corners at the top
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Image.network(
-              recipe.imageUrl,
-              height: 250,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              // Loading placeholder
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Container(
-                  height: 250,
-                  color: Colors.grey[200],
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
+          // Image with overlay
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                child: Image.network(
+                  recipe.imageUrl,
+                  height: 280,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 280,
+                      color: Colors.grey[200],
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 280,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.error, size: 50),
+                    );
+                  },
+                ),
+              ),
+              // Category badge
+              Positioned(
+                top: 12,
+                left: 12,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    recipe.category,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
                     ),
                   ),
-                );
-              },
-              // Error placeholder
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  height: 250,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.error, size: 50),
-                );
-              },
-            ),
+                ),
+              ),
+            ],
           ),
 
-          // Recipe details section
+          // Recipe details
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -68,95 +93,129 @@ class RecipeCard extends StatelessWidget {
                 Text(
                   recipe.name,
                   style: GoogleFonts.poppins(
-                    fontSize: 24,
+                    fontSize: 26,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
 
-                // Category and Area tags
-                Row(
-                  children: [
-                    _buildTag(recipe.category, Icons.restaurant_menu),
-                    const SizedBox(width: 12),
-                    _buildTag(recipe.area, Icons.public),
-                  ],
+                // Area tag
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[100],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.public, size: 16, color: Colors.orange[800]),
+                      const SizedBox(width: 4),
+                      Text(
+                        recipe.area,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.orange[800],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // Ingredients section
                 Text(
-                  'Ingredients',
+                  'Ingredients (${recipe.ingredients.length})',
                   style: GoogleFonts.poppins(
                     fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
 
-                // Ingredients list
-                ...recipe.ingredients.map((ingredient) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('• ', style: TextStyle(fontSize: 16)),
-                          Expanded(
-                            child: Text(
-                              ingredient,
-                              style: const TextStyle(fontSize: 15),
-                            ),
+                // Ingredients grid
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    children: [
+                      ...recipe.ingredients.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final ingredient = entry.value;
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            bottom: index < recipe.ingredients.length - 1 ? 8 : 0,
                           ),
-                        ],
-                      ),
-                    )),
-                const SizedBox(height: 16),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: Colors.orange,
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    '•',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  ingredient,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
 
                 // Instructions section
                 Text(
                   'Instructions',
                   style: GoogleFonts.poppins(
                     fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
 
-                // Show full instructions with proper formatting
-                Text(
-                  recipe.instructions,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 1.5,
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.orange[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange[100]!, width: 1),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    recipe.instructions,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      height: 1.6,
+                      color: Colors.black87,
+                    ),
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Helper method to build category/area tags
-  Widget _buildTag(String text, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.orange[100],
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: Colors.orange[800]),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.orange[800],
-              fontWeight: FontWeight.w500,
             ),
           ),
         ],

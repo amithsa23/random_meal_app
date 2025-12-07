@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'models/grocery_item.dart';
 import 'screens/home_screen.dart';
+import 'screens/grocery_list_screen.dart';
 
 /// Main entry point for the RandomMeal app
 void main() {
   runApp(const RandomMealApp());
 }
 
-/// Root widget of the application
+/// Root widget with enhanced design and navigation
 class RandomMealApp extends StatelessWidget {
   const RandomMealApp({super.key});
 
@@ -14,9 +16,7 @@ class RandomMealApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'RandomMeal',
-      // Remove debug banner
       debugShowCheckedModeBanner: false,
-      // App theme
       theme: ThemeData(
         primarySwatch: Colors.orange,
         colorScheme: ColorScheme.fromSeed(
@@ -24,9 +24,85 @@ class RandomMealApp extends StatelessWidget {
           brightness: Brightness.light,
         ),
         useMaterial3: true,
+        cardTheme: CardTheme(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
       ),
-      // Set HomeScreen as the initial route
-      home: const HomeScreen(),
+      home: const RandomMealHome(),
+    );
+  }
+}
+
+/// Main navigation screen with bottom tab bar
+class RandomMealHome extends StatefulWidget {
+  const RandomMealHome({super.key});
+
+  @override
+  State<RandomMealHome> createState() => _RandomMealHomeState();
+}
+
+class _RandomMealHomeState extends State<RandomMealHome> {
+  int _selectedIndex = 0;
+  final GroceryList _groceryList = GroceryList();
+  late List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      HomeScreen(groceryList: _groceryList),
+      GroceryListScreen(groceryList: _groceryList),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          _selectedIndex == 0 ? 'RandomMeal' : 'Shopping List',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+        ),
+        backgroundColor: Colors.orange,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.orange,
+        unselectedItemColor: Colors.grey[400],
+        items: [
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.restaurant),
+            label: 'Recipes',
+            tooltip: 'Find Recipes',
+          ),
+          BottomNavigationBarItem(
+            icon: Badge(
+              label: _groceryList.items.isEmpty
+                  ? null
+                  : Text('${_groceryList.items.length}'),
+              child: const Icon(Icons.shopping_cart),
+            ),
+            label: 'Shopping',
+            tooltip: 'Shopping List',
+          ),
+        ],
+      ),
     );
   }
 }
