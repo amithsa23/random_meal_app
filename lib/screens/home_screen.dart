@@ -109,30 +109,53 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showMealPlanDaySelector() {
     if (_currentRecipe == null || widget.mealPlan == null) return;
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add to Meal Plan'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: WeeklyMealPlan.weekDays.map((day) {
-              return ListTile(
-                title: Text(day),
-                onTap: () {
-                  widget.mealPlan!.addMealToDay(day, _currentRecipe!);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${_currentRecipe!.name} added to $day!'),
-                      backgroundColor: Colors.blue,
-                      duration: const Duration(seconds: 2),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Add to Meal Plan',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SingleChildScrollView(
+              child: Column(
+                children: WeeklyMealPlan.weekDays.map((day) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        widget.mealPlan!.addMealToDay(day, _currentRecipe!);
+                        Navigator.pop(context);
+                        setState(() {});
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${_currentRecipe!.name} added to $day!'),
+                            backgroundColor: Colors.blue,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.add),
+                      label: Text(day),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
                     ),
                   );
-                },
-              );
-            }).toList(),
-          ),
+                }).toList(),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -193,6 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       // Action buttons
                       Column(
                         children: [
+                          // First row: Add to List & Add to Plan
                           Row(
                             children: [
                               Expanded(
@@ -208,19 +232,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              if (widget.mealPlan != null)
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                    onPressed: _showMealPlanDaySelector,
-                                    icon: const Icon(Icons.calendar_today),
-                                    label: const Text('Add to Plan'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                    ),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: _showMealPlanDaySelector,
+                                  icon: const Icon(Icons.calendar_today),
+                                  label: const Text('Add to Plan'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
                                   ),
                                 ),
+                              ),
                               const SizedBox(width: 12),
                               ElevatedButton.icon(
                                 onPressed: _toggleFavorite,
