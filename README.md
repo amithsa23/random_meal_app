@@ -5,6 +5,10 @@ A Flutter random recipe generator that fetches delicious meals from TheMealDB AP
 ![RandomMeal](https://img.shields.io/badge/Flutter-Web%20App-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+## 📹 Video Demo
+
+Watch the full app demonstration: [RandomMeal App Demo](https://youtu.be/8Wzs3epNPd8)
+
 ## 🌟 Features
 
 - 🎲 **Random Meal Generator** - Discover new recipes with one click
