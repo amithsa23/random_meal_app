@@ -50,7 +50,7 @@ class _RandomMealHomeState extends State<RandomMealHome> {
   void initState() {
     super.initState();
     _screens = [
-      HomeScreen(groceryList: _groceryList),
+      HomeScreen(groceryList: _groceryList, mealPlan: _mealPlan),
       GroceryListScreen(groceryList: _groceryList),
       MealPlannerScreen(
         mealPlan: _mealPlan,
