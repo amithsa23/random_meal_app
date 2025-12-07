@@ -1,0 +1,36 @@
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Build outputs
+build/
+.dart_tool/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+test/
+coverage/
+
+# Documentation (optional - include if you want them in the image)
+*.md
+!README.md
+
+# Platform-specific
+ios/
+android/
+linux/
+macos/
+windows/

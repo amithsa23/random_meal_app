@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  random-meal-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    container_name: random_meal_app
